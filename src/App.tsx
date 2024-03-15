@@ -48,7 +48,7 @@ function App() {
       });
 
       setNearestTemperature(nearestTemp);
-      setTemperatureTooltipPotisions(latlng);
+      setTemperatureTooltipPotisions(nearestPoint);
       showRoute();
     },
   };
