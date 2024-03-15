@@ -1,52 +1,112 @@
 import './App.css';
 
-import React, { useState } from 'react';
+import { LatLng, LatLngExpression, LatLngTuple, LeafletMouseEvent } from 'leaflet';
+import { ReactNode, useCallback, useMemo, useState } from 'react';
+import { Marker, Polyline, Popup } from 'react-leaflet';
 
-import logo from './logo.svg';
+import Map from './components/map/Map/Map';
+import TemperatureTooltip from './components/map/TemperatureTooltip/TemperatureTooltip';
+import * as locationJson from './data/location.json';
+import * as temperaturesJson from './data/temperatures.json';
 
 function App() {
-  const [count, setCount] = useState(0);
+  const [locationData, setLocationData] = useState(locationJson);
+  const [temperaturesData, setTemperaturesData] = useState(temperaturesJson);
+  const [route, setRoute] = useState<ReactNode>();
+  const [routeLocation, setRouteLocation] = useState<LatLngTuple>();
+  const [nearestTemperature, setNearestTemperature] = useState<number>(0);
+  const [temperatureTooltipPotisions, setTemperatureTooltipPotisions] =
+    useState<LatLngExpression>();
+  //   const [temperatureTooltip, setTemperaturesTooltip] = useState<ReactNode>(null);
+
+  const coordinates: LatLngTuple[] = [];
+  const timestamp: string[] = [];
+
+  const eventHandlers = {
+    mouseover(event: LeafletMouseEvent) {
+      const { latlng } = event;
+      let nearestPoint = coordinates[0];
+      let nearestPointDate = new Date(timestamp[0]);
+
+      coordinates.forEach((c, i) => {
+        if (latlng.distanceTo(c) < latlng.distanceTo(nearestPoint)) {
+          nearestPoint = c;
+          nearestPointDate = new Date(timestamp[i]);
+        }
+      });
+
+      let nearestDate = new Date(temperaturesData.Timestamp[0]);
+      let nearestTemp = temperaturesData.OutsideTemp[0];
+
+      temperaturesData.Timestamp.forEach((t, i) => {
+        const difference1 = Math.abs(nearestPointDate.getTime() - nearestDate.getTime());
+        const difference2 = Math.abs(nearestPointDate.getTime() - new Date(t).getTime());
+        if (difference2 < difference1) {
+          nearestDate = new Date(t);
+          nearestTemp = temperaturesData.OutsideTemp[i];
+        }
+      });
+
+      setNearestTemperature(nearestTemp);
+      setTemperatureTooltipPotisions(latlng);
+      showRoute();
+    },
+  };
+
+  const showRoute = (): void => {
+    const latitude = locationData.Latitude;
+    const longtitude = locationData.Longitude;
+
+    if (latitude.length !== longtitude.length) {
+      throw new Error('Incorrect data');
+    }
+
+    latitude.forEach((el, i) => {
+      if (isNaN(+el) || isNaN(+longtitude[i])) {
+        return;
+      }
+      coordinates.push([+el, +longtitude[i]]);
+      timestamp.push(locationData.Timestamp[i]);
+    });
+
+    const pathOptions = { color: 'purple' };
+    const positions = coordinates;
+
+    const polyline = (
+      <Polyline
+        pathOptions={pathOptions}
+        positions={positions}
+        eventHandlers={eventHandlers}
+      >
+        <TemperatureTooltip temperature={nearestTemperature} position={coordinates[0]} />
+
+        <Popup>
+          <div>Номер локомотива: {locationData.LocoNumber}</div>
+          <div>Тип локомотива: {locationData.LocoType}</div>
+        </Popup>
+        <Marker position={positions[0]}>
+          <Popup>Начало маршрута</Popup>
+        </Marker>
+        <Marker position={positions[positions.length - 1]}>
+          <Popup>Конец маршрута</Popup>
+        </Marker>
+      </Polyline>
+    );
+
+    setRoute(polyline);
+    setRouteLocation(coordinates[0]);
+  };
 
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p className="header">
-          🚀 Vite + React + Typescript 🤘 & <br />
-          Eslint 🔥+ Prettier
-        </p>
-
-        <div className="body">
-          <button onClick={() => setCount((count) => count + 1)}>
-            🪂 Click me : {count}
-          </button>
-
-          <p> Don&apos;t forgot to install Eslint and Prettier in Your Vscode.</p>
-
-          <p>
-            Mess up the code in <code>App.tsx </code> and save the file.
-          </p>
-          <p>
-            <a
-              className="App-link"
-              href="https://reactjs.org"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learn React
-            </a>
-            {' | '}
-            <a
-              className="App-link"
-              href="https://vitejs.dev/guide/features.html"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Vite Docs
-            </a>
-          </p>
-        </div>
-      </header>
+      <div>Выбранный поезд:</div>
+      <button onClick={showRoute}>показать маршрут</button>
+      <Map
+        polyline={route}
+        scrollIntoView={true}
+        curLocation={routeLocation}
+        curLocationZoom={14}
+      />
     </div>
   );
 }
