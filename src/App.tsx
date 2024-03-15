@@ -78,7 +78,10 @@ function App() {
         positions={positions}
         eventHandlers={eventHandlers}
       >
-        <TemperatureTooltip temperature={nearestTemperature} position={coordinates[0]} />
+        <TemperatureTooltip
+          temperature={nearestTemperature}
+          position={temperatureTooltipPotisions}
+        />
 
         <Popup>
           <div>Номер локомотива: {locationData.LocoNumber}</div>
