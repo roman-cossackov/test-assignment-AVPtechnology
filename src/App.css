@@ -1,0 +1,28 @@
+.train-name {
+  text-align: center;
+  margin-top: 10px;
+  font-size: 1.3rem;
+}
+.route-button {
+  display: block;
+  margin: 0 auto;
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff;
+  text-transform: uppercase;
+  background-color: #9b59b6;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.route-button:hover {
+  background-color: #8e44ad;
+}
+
+.route-button:active {
+  background-color: #7d3c98;
+}

@@ -1,7 +1,7 @@
 import './App.css';
 
-import { LatLng, LatLngExpression, LatLngTuple, LeafletMouseEvent } from 'leaflet';
-import { ReactNode, useCallback, useMemo, useState } from 'react';
+import { LatLngExpression, LatLngTuple, LeafletMouseEvent } from 'leaflet';
+import { ReactNode, useState } from 'react';
 import { Marker, Polyline, Popup } from 'react-leaflet';
 
 import Map from './components/map/Map/Map';
@@ -78,10 +78,10 @@ function App() {
         positions={positions}
         eventHandlers={eventHandlers}
       >
-        <TemperatureTooltip
+        {/* <TemperatureTooltip
           temperature={nearestTemperature}
           position={temperatureTooltipPotisions}
-        />
+        /> */}
 
         <Popup>
           <div>Номер локомотива: {locationData.LocoNumber}</div>
@@ -102,8 +102,12 @@ function App() {
 
   return (
     <div className="App">
-      <div>Выбранный поезд:</div>
-      <button onClick={showRoute}>показать маршрут</button>
+      <div className="train-name">
+        Выбранный поезд: {`${locationData.LocoType} ${locationData.LocoNumber}`}
+      </div>
+      <button className="route-button" onClick={showRoute}>
+        Показать маршрут
+      </button>
       <Map
         polyline={route}
         scrollIntoView={true}
