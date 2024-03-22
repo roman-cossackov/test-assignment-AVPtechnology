@@ -1,6 +1,9 @@
 import './App.css';
 
 import { LatLngExpression, LatLngTuple, LeafletMouseEvent } from 'leaflet';
+import { Icon } from 'leaflet';
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 import { ReactNode, useState } from 'react';
 import { Marker, Polyline, Popup } from 'react-leaflet';
 
@@ -53,6 +56,11 @@ function App() {
     },
   };
 
+  const MarkerIcon = new Icon({
+    iconUrl: icon,
+    shadowUrl: iconShadow,
+  });
+
   const showRoute = (): void => {
     const latitude = locationData.Latitude;
     const longtitude = locationData.Longitude;
@@ -87,10 +95,10 @@ function App() {
           <div>Номер локомотива: {locationData.LocoNumber}</div>
           <div>Тип локомотива: {locationData.LocoType}</div>
         </Popup>
-        <Marker position={positions[0]}>
+        <Marker position={positions[0]} icon={MarkerIcon}>
           <Popup>Начало маршрута</Popup>
         </Marker>
-        <Marker position={positions[positions.length - 1]}>
+        <Marker position={positions[positions.length - 1]} icon={MarkerIcon}>
           <Popup>Конец маршрута</Popup>
         </Marker>
       </Polyline>
