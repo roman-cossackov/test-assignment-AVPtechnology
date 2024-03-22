@@ -18,7 +18,7 @@ const Map = ({ polyline, curLocation, scrollIntoView, curLocationZoom }: MapProp
   const mapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (scrollIntoView && mapRef.current) {
+    if (polyline && scrollIntoView && mapRef.current) {
       mapRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   }, [polyline]);
